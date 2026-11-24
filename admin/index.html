@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>لوحة التحكم | كورسيه</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="bg"></div>
+
+  <section class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-brand">
+        <span class="brand-mark">C</span>
+        <div>
+          <h1>لوحة تحكم المتجر</h1>
+          <p>أدخل كلمة المرور للوصول إلى إدارة المنتجات</p>
+        </div>
+      </div>
+      <form id="loginForm" class="login-form">
+        <label class="field">
+          <span>كلمة المرور</span>
+          <input type="password" id="passwordInput" autocomplete="current-password" required placeholder="••••••••">
+        </label>
+        <p class="feedback" id="loginFeedback" role="status" aria-live="polite"></p>
+        <button type="submit" class="btn btn-primary btn-block">دخول</button>
+      </form>
+      <p class="login-note">هذه الصفحة مخصصة لمدير المتجر فقط. المسار: <code>/admin/</code></p>
+    </div>
+  </section>
+
+  <div class="app hidden" id="adminApp">
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <div class="topbar-brand">
+          <span class="brand-mark small">C</span>
+          <div>
+            <strong>لوحة التحكم</strong>
+            <span>إدارة منتجات كورسيه</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <a class="btn btn-ghost btn-sm" href="../index.html" target="_blank" rel="noopener">عرض المتجر</a>
+          <button class="btn btn-ghost btn-sm" id="changePasswordBtn" type="button">تغيير كلمة المرور</button>
+          <button class="btn btn-danger btn-sm" id="logoutBtn" type="button">تسجيل خروج</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container main">
+      <section class="stats" aria-label="إحصائيات">
+        <div class="stat-card">
+          <span class="stat-label">إجمالي المنتجات</span>
+          <strong id="statTotal">0</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">متوفر</span>
+          <strong id="statAvailable">0</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">غير متوفر</span>
+          <strong id="statHidden">0</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">المصدر</span>
+          <strong class="stat-small">products.js</strong>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 id="formTitle">إضافة منتج جديد</h2>
+            <p>أضف منتجاً أو عدّل منتجاً موجوداً. بعد الحفظ، صدّر ملف <code>products.js</code> وارفعه إلى GitHub ليظهر التغيير للزوار.</p>
+          </div>
+          <button class="btn btn-ghost btn-sm hidden" id="cancelEditBtn" type="button">إلغاء التعديل</button>
+        </div>
+
+        <form id="productForm" class="product-form">
+          <input type="hidden" id="productId">
+          <div class="form-grid">
+            <label class="field">
+              <span>اسم المنتج</span>
+              <input type="text" id="name" required placeholder="مثال: كورسيه شد كلاسيكي">
+            </label>
+            <label class="field">
+              <span>السعر</span>
+              <input type="number" id="price" required min="0" step="0.01" placeholder="199">
+            </label>
+            <label class="field">
+              <span>الشارة</span>
+              <input type="text" id="badge" placeholder="مثال: جديد / مميز">
+            </label>
+            <label class="field">
+              <span>الصورة</span>
+              <input type="text" id="image" required placeholder="اسم الملف أو رابط الصورة">
+            </label>
+          </div>
+          <label class="field">
+            <span>الوصف</span>
+            <textarea id="description" rows="3" required placeholder="وصف قصير للمنتج"></textarea>
+          </label>
+          <div class="form-row">
+            <label class="check">
+              <input type="checkbox" id="available" checked>
+              <span>المنتج متوفر للعرض في المتجر</span>
+            </label>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="saveProductBtn">حفظ المنتج</button>
+            </div>
+          </div>
+          <p class="feedback" id="formFeedback" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>المنتجات</h2>
+            <p>يمكنك التعديل، الحذف، أو إخفاء المنتج من المتجر.</p>
+          </div>
+          <div class="panel-actions">
+            <button class="btn btn-ghost btn-sm" id="exportBtn" type="button">تصدير products.js</button>
+            <button class="btn btn-ghost btn-sm" id="copyBtn" type="button">نسخ البيانات</button>
+            <button class="btn btn-ghost btn-sm" id="resetBtn" type="button">استعادة الملف الأصلي</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="products-table">
+            <thead>
+              <tr>
+                <th>المنتج</th>
+                <th>السعر</th>
+                <th>الحالة</th>
+                <th>الصورة</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="productsTableBody"></tbody>
+          </table>
+        </div>
+        <p class="table-empty hidden" id="emptyState">لا توجد منتجات حالياً. أضف منتجاً من النموذج أعلاه.</p>
+      </section>
+
+      <section class="panel notice-panel">
+        <h2>مهم للنشر على GitHub Pages</h2>
+        <ul>
+          <li>التغييرات التي تجريها هنا تُحفظ داخل متصفحك كمسودة. الزوار لن يروا التغييرات حتى ترفع ملف <code>products.js</code> المصدّر إلى GitHub.</li>
+          <li>بعد التعديل، اضغط <strong>تصدير products.js</strong> ثم استبدل الملف القديم في المستودع وادفع التحديث.</li>
+          <li>حماية كلمة المرور هنا حماية واجهة على موقع ثابت؛ لأمان أعلى استخدم استضافة خاصة مع خادم وصلاحيات حقيقية.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="modal" id="passwordModal">
+    <form method="dialog" class="modal-card" id="passwordChangeForm">
+      <h3>تغيير كلمة المرور</h3>
+      <label class="field">
+        <span>كلمة المرور الحالية</span>
+        <input type="password" id="currentPassword" required>
+      </label>
+      <label class="field">
+        <span>كلمة المرور الجديدة</span>
+        <input type="password" id="newPassword" required minlength="6">
+      </label>
+      <label class="field">
+        <span>تأكيد كلمة المرور الجديدة</span>
+        <input type="password" id="confirmPassword" required minlength="6">
+      </label>
+      <p class="feedback" id="passwordFeedback" role="status" aria-live="polite"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="closePasswordModal">إلغاء</button>
+        <button type="submit" class="btn btn-primary">حفظ</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="../products.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

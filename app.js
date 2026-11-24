@@ -2,11 +2,11 @@
  * إعدادات المتجر — عدّل هذه القيم قبل النشر
  */
 const STORE = {
-  name: "كورسيه",
-  // رقم واتساب بصيغة دولية بدون + أو 00. مثال للسعودية: 9665XXXXXXXX
-  whatsappNumber: "966500000000",
+  name: "Sili Store",
+  // رقم واتساب بصيغة دولية بدون + أو 00. مثال: 9639XXXXXXXX
+  whatsappNumber: "963991189602",
   // الرقم المعروض للزوار (يمكنك تغييره بالشكل الذي تفضله)
-  whatsappDisplay: "+966 5X XXX XXXX",
+  whatsappDisplay: "0991189602",
   // لاستقبال الطلبات عبر الموقع، أنشئ نموذجاً مجاناً على https://formspree.io
   // ثم ضع رابط النموذج هنا. مثال: "https://formspree.io/f/xxxxxx"
   formEndpoint: "",

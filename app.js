@@ -9,7 +9,7 @@ const STORE = {
   whatsappDisplay: "0991189602",
   // لاستقبال الطلبات عبر الموقع، أنشئ نموذجاً مجاناً على https://formspree.io
   // ثم ضع رابط النموذج هنا. مثال: "https://formspree.io/f/xxxxxx"
-  formEndpoint: "",
+  formEndpoint: "https://formspree.io/f/xwloadyv",
   currency: "ر.س",
 };
 

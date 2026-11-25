@@ -605,6 +605,15 @@ code {
   .order-form-wrap { padding: 1.25rem; border-radius: 22px; }
 }
 
+/* Location field */
+.location-row { display: flex; gap: 0.6rem; align-items: stretch; }
+.location-row input { flex: 1; }
+.location-row .btn { white-space: nowrap; }
+.field-hint { color: var(--muted); font-size: 0.8rem; line-height: 1.5; }
+@media (max-width: 640px) {
+  .location-row { flex-direction: column; }
+}
+
 /* Category filters */
 .category-filters {
   display: flex;

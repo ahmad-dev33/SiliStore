@@ -212,6 +212,15 @@
             </label>
 
             <label class="field">
+              <span>موقع التوصيل</span>
+              <div class="location-row">
+                <input type="text" name="location" id="location" placeholder="رابط الموقع أو اضغط تحديد موقعي" readonly>
+                <button type="button" class="btn btn-ghost btn-sm" id="locateBtn">تحديد موقعي</button>
+              </div>
+              <small class="field-hint" id="locationStatus">يمكنك تحديد موقعك لمشاركته مع الطلب.</small>
+            </label>
+
+            <label class="field">
               <span>ملاحظات إضافية</span>
               <textarea name="notes" id="notes" rows="4" placeholder="مثلاً: اللون المفضل، وقت التواصل، أو أي استفسار"></textarea>
             </label>
@@ -222,7 +231,7 @@
               <button type="submit" class="btn btn-primary" id="whatsappSubmit">إرسال الطلب عبر واتساب</button>
               <button type="button" class="btn btn-ghost" id="siteSubmit">إرسال عبر الموقع</button>
             </div>
-            <p class="form-hint">زر "إرسال عبر الموقع" يعمل بعد إضافة رابط Formspree في ملف <code>app.js</code>.</p>
+
           </form>
         </div>
       </div>

@@ -10,7 +10,7 @@ const STORE = {
   // لاستقبال الطلبات عبر الموقع، أنشئ نموذجاً مجاناً على https://formspree.io
   // ثم ضع رابط النموذج هنا. مثال: "https://formspree.io/f/xxxxxx"
   formEndpoint: "https://formspree.io/f/xwloadyv",
-  currency: "ر.س",
+  currency: "ل.س",
 };
 
 /**
@@ -56,6 +56,7 @@ function buildOrderMessage(data) {
     `المنتج: ${data.product}`,
     `المقاس: ${data.size}`,
     `المدينة/العنوان: ${data.address || "غير محدد"}`,
+    `الموقع: ${data.location || "غير محدد"}`,
     `ملاحظات: ${data.notes || "لا يوجد"}`,
   ];
   return lines.join("\n");
@@ -168,6 +169,7 @@ function readForm() {
     product: productLabel,
     size: String(formData.get("size") || "").trim(),
     address: String(formData.get("address") || "").trim(),
+    location: String(formData.get("location") || document.getElementById("location")?.value || "").trim(),
     notes: String(formData.get("notes") || "").trim(),
   };
 }
@@ -236,6 +238,7 @@ async function submitToSite(data) {
         product: data.product,
         size: data.size,
         address: data.address,
+        location: data.location,
         notes: data.notes,
         source: window.location.href,
       }),
@@ -254,6 +257,41 @@ async function submitToSite(data) {
 }
 
 function setupForm() {
+  const locateBtn = document.getElementById("locateBtn");
+  const locationInput = document.getElementById("location");
+  const locationStatus = document.getElementById("locationStatus");
+
+  locateBtn?.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      if (locationStatus) locationStatus.textContent = "المتصفح لا يدعم تحديد الموقع. يمكنك لصق رابط الخريطة يدوياً.";
+      locationInput?.removeAttribute("readonly");
+      return;
+    }
+    locateBtn.disabled = true;
+    locateBtn.textContent = "جارٍ التحديد...";
+    if (locationStatus) locationStatus.textContent = "جارٍ الحصول على موقعك...";
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const url = `https://maps.google.com/?q=${latitude},${longitude}`;
+        if (locationInput) {
+          locationInput.value = url;
+          locationInput.readOnly = false;
+        }
+        if (locationStatus) locationStatus.textContent = "تم تحديد موقعك وإضافته للطلب.";
+        locateBtn.disabled = false;
+        locateBtn.textContent = "تحديث الموقع";
+      },
+      () => {
+        if (locationStatus) locationStatus.textContent = "تعذر تحديد الموقع. تأكد من السماح بالموقع أو الصق رابط الخريطة يدوياً.";
+        if (locationInput) locationInput.readOnly = false;
+        locateBtn.disabled = false;
+        locateBtn.textContent = "تحديد موقعي";
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  });
+
   orderForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const data = readForm();

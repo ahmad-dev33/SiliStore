@@ -85,16 +85,24 @@
           <input type="hidden" id="productId">
           <div class="form-grid">
             <label class="field">
-              <span>اسم المنتج</span>
-              <input type="text" id="name" required placeholder="مثال: كورسيه شد كلاسيكي">
+              <span>رمز المنتج</span>
+              <input type="text" id="code" placeholder="مثال: E1">
             </label>
             <label class="field">
-              <span>السعر</span>
-              <input type="number" id="price" required min="0" step="0.01" placeholder="199">
+              <span>الفئة</span>
+              <input type="text" id="category" placeholder="مثال: المجموعة E - مشدات رجالية">
+            </label>
+            <label class="field">
+              <span>اسم المنتج</span>
+              <input type="text" id="name" required placeholder="مثال: صدرية ضاغطة">
+            </label>
+            <label class="field">
+              <span>السعر <small>(0 = تواصل للسعر)</small></span>
+              <input type="number" id="price" required min="0" step="0.01" placeholder="0">
             </label>
             <label class="field">
               <span>الشارة</span>
-              <input type="text" id="badge" placeholder="مثال: جديد / مميز">
+              <input type="text" id="badge" placeholder="مثال: رجالي / نسائي">
             </label>
             <label class="field">
               <span>الصورة</span>
@@ -135,6 +143,7 @@
             <thead>
               <tr>
                 <th>المنتج</th>
+                <th>الفئة</th>
                 <th>السعر</th>
                 <th>الحالة</th>
                 <th>الصورة</th>

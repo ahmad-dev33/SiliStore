@@ -184,7 +184,7 @@ code {
 .check input { width: 18px; height: 18px; accent-color: var(--primary); }
 
 .table-wrap { overflow-x: auto; }
-.products-table { width: 100%; border-collapse: collapse; min-width: 760px; }
+.products-table { width: 100%; border-collapse: collapse; min-width: 920px; }
 .products-table th, .products-table td {
   padding: 0.9rem 0.75rem;
   text-align: right;

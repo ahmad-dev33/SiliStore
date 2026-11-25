@@ -27,9 +27,19 @@ const formFeedback = document.getElementById("formFeedback");
 const siteSubmitBtn = document.getElementById("siteSubmit");
 const menuToggle = document.getElementById("menuToggle");
 const navLinks = document.getElementById("navLinks");
+const categoryFilters = document.getElementById("categoryFilters");
+let activeCategory = "all";
 
 function formatPrice(price) {
-  return `${price} <small>${STORE.currency}</small>`;
+  const num = Number(price);
+  if (!Number.isFinite(num) || num <= 0) return `<span class="price-contact">تواصل للسعر</span>`;
+  return `${num} <small>${STORE.currency}</small>`;
+}
+
+function priceText(price) {
+  const num = Number(price);
+  if (!Number.isFinite(num) || num <= 0) return "تواصل للسعر";
+  return `${num} ${STORE.currency}`;
 }
 
 function getWhatsAppUrl(message) {
@@ -60,26 +70,69 @@ function setFeedback(message, type = "") {
   formFeedback.className = `form-feedback ${type}`.trim();
 }
 
+function getCategories() {
+  return ["all", ...new Set(PRODUCTS.map((p) => p.category).filter(Boolean))];
+}
+
+function renderCategoryFilters() {
+  if (!categoryFilters) return;
+  const categories = getCategories();
+  categoryFilters.innerHTML = categories.map((cat) => {
+    const label = cat === "all" ? "الكل" : cat;
+    const active = cat === activeCategory ? "active" : "";
+    return `<button type="button" class="filter-btn ${active}" data-category="${escapeAttr(cat)}">${escapeHtml(label)}</button>`;
+  }).join("");
+
+  categoryFilters.querySelectorAll(".filter-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      activeCategory = btn.dataset.category || "all";
+      renderCategoryFilters();
+      renderProducts();
+    });
+  });
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value);
+}
+
 function renderProducts() {
-  productsGrid.innerHTML = PRODUCTS.map((product) => `
+  const visible = activeCategory === "all" ? PRODUCTS : PRODUCTS.filter((p) => p.category === activeCategory);
+  productsGrid.innerHTML = visible.map((product) => {
+    const code = product.code ? `<span class="product-code">${escapeHtml(product.code)}</span>` : "";
+    const badge = product.badge ? `<span class="product-badge">${escapeHtml(product.badge)}</span>` : "";
+    return `
     <article class="product-card">
       <div class="product-media">
-        <img src="${product.image}" alt="${product.name}" loading="lazy">
-        <span class="product-badge">${product.badge}</span>
+        <img src="${escapeAttr(product.image)}" alt="${escapeAttr(product.name)}" loading="lazy">
+        ${badge}
       </div>
       <div class="product-body">
-        <h3>${product.name}</h3>
-        <p>${product.description}</p>
+        <div class="product-title-row">
+          ${code}
+          <h3>${escapeHtml(product.name)}</h3>
+        </div>
+        <p>${escapeHtml(product.description)}</p>
         <div class="product-meta">
           <div class="price">${formatPrice(product.price)}</div>
         </div>
         <div class="product-actions">
-          <button class="btn btn-primary btn-sm order-product" data-product-id="${product.id}">اطلبي الآن</button>
-          <a class="btn btn-ghost btn-sm" href="${getWhatsAppUrl(`مرحباً، أرغب بالاستفسار عن ${product.name} بسعر ${product.price} ${STORE.currency}`)}" target="_blank" rel="noopener">استفسار</a>
+          <button class="btn btn-primary btn-sm order-product" data-product-id="${escapeAttr(product.id)}">اطلبي الآن</button>
+          <a class="btn btn-ghost btn-sm" href="${getWhatsAppUrl(`مرحباً، أرغب بالاستفسار عن ${product.code ? product.code + " - " : ""}${product.name} (${priceText(product.price)})`)}" target="_blank" rel="noopener">استفسار</a>
         </div>
       </div>
     </article>
-  `).join("");
+  `;
+  }).join("");
 
   document.querySelectorAll(".order-product").forEach((button) => {
     button.addEventListener("click", () => {
@@ -95,18 +148,24 @@ function renderProducts() {
 function renderProductSelect() {
   productSelect.innerHTML = [
     '<option value="">اختاري المنتج</option>',
-    ...PRODUCTS.map((p) => `<option value="${p.id}">${p.name} — ${p.price} ${STORE.currency}</option>`),
+    ...PRODUCTS.map((p) => {
+      const code = p.code ? `${p.code} - ` : "";
+      return `<option value="${escapeAttr(p.id)}">${escapeHtml(code + p.name)} — ${escapeHtml(priceText(p.price))}</option>`;
+    }),
   ].join("");
 }
 
 function readForm() {
   const formData = new FormData(orderForm);
   const product = PRODUCTS.find((p) => p.id === formData.get("product"));
+  const productLabel = product
+    ? `${product.code ? product.code + " - " : ""}${product.name} (${priceText(product.price)})`
+    : "";
   return {
     name: String(formData.get("name") || "").trim(),
     phone: String(formData.get("phone") || "").trim(),
     productId: String(formData.get("product") || "").trim(),
-    product: product ? `${product.name} (${product.price} ${STORE.currency})` : "",
+    product: productLabel,
     size: String(formData.get("size") || "").trim(),
     address: String(formData.get("address") || "").trim(),
     notes: String(formData.get("notes") || "").trim(),
@@ -122,7 +181,7 @@ function validateForm(data) {
 }
 
 function setupWhatsAppLinks() {
-  const defaultMessage = `مرحباً، أرغب بالاستفسار عن منتجات متجر ${STORE.name}.`;
+  const defaultMessage = `مرحباً، أرغب بالاستفسار عن المشدات الطبية والتجميلية من ${STORE.name}.`;
   const url = getWhatsAppUrl(defaultMessage);
   const float = document.getElementById("whatsappFloat");
   const footerWhatsapp = document.getElementById("footerWhatsapp");
@@ -221,6 +280,7 @@ function setupForm() {
 
 function init() {
   document.getElementById("year").textContent = String(new Date().getFullYear());
+  renderCategoryFilters();
   renderProducts();
   renderProductSelect();
   setupWhatsAppLinks();

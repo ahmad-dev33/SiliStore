@@ -99,21 +99,24 @@ function renderProducts() {
     const imgSrc = normalizeImagePath(product.image);
     const safeName = escapeHtml(product.name);
     const safeDesc = escapeHtml(product.description);
-    const safeBadge = escapeHtml(product.badge || "—");
+    const safeCode = escapeHtml(product.code || "");
+    const safeCategory = escapeHtml(product.category || "—");
     const safeImage = escapeHtml(product.image || "");
     const price = Number(product.price) || 0;
+    const priceLabel = price > 0 ? String(price) : "تواصل للسعر";
     return `
       <tr>
         <td>
           <div class="product-cell">
             <img class="thumb" src="${escapeHtml(imgSrc)}" alt="${safeName}" onerror="this.style.opacity='.25'">
             <div>
-              <strong>${safeName}</strong>
+              <strong>${safeCode ? `<span style="color:#8b5e4b">${safeCode}</span> - ` : ""}${safeName}</strong>
               <span>${safeDesc}</span>
             </div>
           </div>
         </td>
-        <td><strong>${price}</strong></td>
+        <td>${safeCategory}</td>
+        <td><strong>${escapeHtml(priceLabel)}</strong></td>
         <td><span class="status ${available ? "on" : "off"}">${available ? "متوفر" : "مخفي"}</span></td>
         <td class="path-cell" title="${safeImage}">${safeImage}</td>
         <td>
@@ -140,6 +143,8 @@ function resetForm() {
 
 function fillForm(product) {
   document.getElementById("productId").value = product.id;
+  document.getElementById("code").value = product.code || "";
+  document.getElementById("category").value = product.category || "";
   document.getElementById("name").value = product.name || "";
   document.getElementById("price").value = product.price ?? "";
   document.getElementById("badge").value = product.badge || "";
@@ -154,8 +159,11 @@ function fillForm(product) {
 
 function readProductForm() {
   const id = document.getElementById("productId").value.trim();
+  const code = document.getElementById("code").value.trim();
   return {
-    id: id || uid(),
+    id: id || code || uid(),
+    code: code,
+    category: document.getElementById("category").value.trim(),
     name: document.getElementById("name").value.trim(),
     price: Number(document.getElementById("price").value),
     badge: document.getElementById("badge").value.trim(),

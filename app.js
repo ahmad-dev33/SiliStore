@@ -278,7 +278,25 @@ function setupForm() {
   });
 }
 
+function hidePreloader() {
+  const preloader = document.getElementById("preloader");
+  if (!preloader) return;
+  const hide = () => preloader.classList.add("hidden");
+  const fallback = setTimeout(hide, 4000);
+  Promise.all([
+    document.fonts ? document.fonts.ready : Promise.resolve(),
+    new Promise((resolve) => {
+      if (document.readyState === "complete") resolve();
+      else window.addEventListener("load", resolve, { once: true });
+    }),
+  ]).then(() => {
+    clearTimeout(fallback);
+    setTimeout(hide, 150);
+  });
+}
+
 function init() {
+  hidePreloader();
   document.getElementById("year").textContent = String(new Date().getFullYear());
   renderCategoryFilters();
   renderProducts();
